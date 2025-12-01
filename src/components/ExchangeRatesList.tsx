@@ -1,11 +1,17 @@
 import React from 'react';
-import { FlatList, Text, View, ActivityIndicator } from 'react-native';
+import { FlatList, Text, View, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
-import { useExchangeRates } from '../hooks/useExchangeRates';
 import { ExchangeRate } from '../types/exchangeRates';
 
-export const ExchangeRatesList: React.FC = () => {
-  const { data, isLoading, error } = useExchangeRates();
+interface Props {
+  rates: ExchangeRate[];
+  isLoading: boolean;
+  error: Error | null;
+}
+
+export const ExchangeRatesList: React.FC<Props> = ({ rates, isLoading, error }) => {
+  const navigation = useNavigation();
 
   if (isLoading) {
     return (
@@ -19,7 +25,7 @@ export const ExchangeRatesList: React.FC = () => {
   if (error) {
     return (
       <Container>
-        <ErrorText>Error: {(error as Error).message}</ErrorText>
+        <ErrorText>Error: {error.message}</ErrorText>
       </Container>
     );
   }
@@ -38,8 +44,11 @@ export const ExchangeRatesList: React.FC = () => {
   return (
     <Container>
       <Header>Daily Exchange Rates (CNB)</Header>
+      <ConvertButton onPress={() => navigation.navigate('Conversion', { rates })}>
+        <ConvertButtonText>Convert Currency</ConvertButtonText>
+      </ConvertButton>
       <FlatList
-        data={data || []}
+        data={rates}
         keyExtractor={(item) => item.code}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
@@ -58,9 +67,23 @@ const Header = styled.Text`
   font-size: 24px;
   font-weight: bold;
   text-align: center;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 14px;
+  margin-bottom: 8px;
   color: #333;
+`;
+
+const ConvertButton = styled.TouchableOpacity`
+  background-color: #007bff;
+  padding: 12px;
+  border-radius: 8px;
+  align-items: center;
+  margin: 16px;
+`;
+
+const ConvertButtonText = styled.Text`
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
 `;
 
 const ItemContainer = styled.View`
@@ -97,7 +120,7 @@ const RateText = styled.Text`
 `;
 
 const AmountText = styled.Text`
-  font-size: 14px;
+  font-size: 15px;
   color: #777;
   margin-top: 2px;
 `;
