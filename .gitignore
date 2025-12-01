@@ -7,6 +7,7 @@ vendor/
 .DS_Store
 
 # iOS
+ios/DerivedData/
 ios/build/
 ios/Pods/
 ios/.xcode.env.local
